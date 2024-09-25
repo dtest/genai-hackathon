@@ -29,38 +29,39 @@ export default function Home() {
           value={fileUri}
           onChange={(e) => setFileUri(e.target.value)}
           className="border-black border-2 text-black p-1 w-full"
+          disabled={status === 'loading'}
         />
-        <button type="submit" className="border-2 p-1 hover:text-white hover:bg-black rounded">
+        <button type="submit" disabled={status === 'loading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
           {'Search Video For Valuable Trading Cards ->'}
         </button>
       </form>
-      <div className={`transition-opacity overflow-x-clip pointer-events-none ${status === 'loading' ? 'opacity-100' : 'opacity-0'} h-0`}>
+      <div className={`transition-opacity duration-1000 overflow-x-clip pointer-events-none ${status === 'loading' ? 'opacity-100' : 'opacity-0'} h-0`}>
         <Card />
       </div>
-      <table className={`transition-opacity table-auto w-full ${favoriteThings.length > 0 ? 'opacity-100' : 'opacity-0'}`}>
+      <table className={`transition-opacity duration-1000 table-auto ${favoriteThings.length > 0 ? 'opacity-100' : 'opacity-0'} m-10`}>
         <thead>
-          <tr>
-            <th>Estimated Value</th>
-            <th>Player</th>
-            <th>Manufacturer</th>
-            <th>Sport</th>
-            <th>Year</th>
-            <th>Search on Google</th>
+          <tr className="text-left">
+            <th className="text-right px-5">Estimated Value</th>
+            <th className="px-5">Player</th>
+            <th className="px-5">Manufacturer</th>
+            <th className="px-5">Sport</th>
+            <th className="px-5">Year</th>
+            <th className="px-5">Search on Google</th>
           </tr>
         </thead>
         <tbody>
-          {favoriteThings.map((item, index) => <tr key={JSON.stringify(index)}>
-            <td>
+          {favoriteThings.map((item, index) => <tr key={JSON.stringify(index)} className="text-left border-y border-white/20">
+            <td className="text-right px-5">
               {(item.estimatedValueInCents / 100).toLocaleString('en-US', {
                 style: 'currency',
                 currency: 'USD'
               })}
             </td>
-            <td>{item.playerName}</td>
-            <td>{item.manufacturer}</td>
-            <td>{item.sport}</td>
-            <td>{item.year}</td>
-            <td>
+            <td className="px-5">{item.playerName}</td>
+            <td className="px-5">{item.manufacturer}</td>
+            <td className="px-5">{item.sport}</td>
+            <td className="px-5">{item.year}</td>
+            <td className="px-5">
               <a href={`https://www.google.com/search?q=${item.year} ${item.playerName} ${item.manufacturer} ${item.sport} card`} target="_blank">Learn More ↗</a>
             </td>
           </tr>)}
