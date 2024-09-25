@@ -3,21 +3,20 @@
 import { extractVideoData } from "./extractVideoData";
 import { groundWithGoogleSearch } from "./groundWithGoogleSearch";
 
-const favoriteThings = [
-    'Chocolate',
-    'Football',
-    'JavaScript',
-    'Volleyball',
-];
+export type EstimatedValueItems = {
+    "fullTitle": string,
+    "playerName": string,
+    "manufacturer": string,
+    "year": string,
+    "sport": string,
+    "estimatedValueInCents": number,
+};
 
-export async function getFavoriteThings() {
-    const extractedVideoData = await extractVideoData();
-    const estimatedValueItems = await groundWithGoogleSearch({ extractedVideoData });
+export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
+    const extractedVideoData = await extractVideoData({ fileUri });
+    const estimatedValueItemsString = await groundWithGoogleSearch({ extractedVideoData });
+    const estimatedValueItems = JSON.parse(estimatedValueItemsString) as EstimatedValueItems[];
+    const sortedValueItems = estimatedValueItems.toSorted((a, b) => b.estimatedValueInCents - a.estimatedValueInCents)
     // TODO: Save estimatedValueItems to database
-    return estimatedValueItems;
-}
-
-export async function addFavoriteThing(newThing: string) {
-    favoriteThings.push(newThing);
-    return;
+    return sortedValueItems;
 }

@@ -1,38 +1,50 @@
 'use client'
-import { useEffect, useState } from "react";
-import { addFavoriteThing, getFavoriteThings } from "./actions";
+import { useState } from "react";
+import { EstimatedValueItems, getItemValueEstimates } from "./actions";
 
 export default function Home() {
-  const [newFavoriteThing, setNewFavoriteThing] = useState('');
-  const [favoriteThings, setFavoriteThings] = useState('');
-  async function getThings() {
-    const updatedListOfThings = await getFavoriteThings();
+  const [fileUri, setFileUri] = useState('gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4');
+  const [favoriteThings, setFavoriteThings] = useState<EstimatedValueItems[]>([]);
+  async function handleClick() {
+    const updatedListOfThings = await getItemValueEstimates({ fileUri });
     setFavoriteThings(updatedListOfThings);
-  }
-  useEffect(() => {
-    getThings();
-  }, []);
-  async function addThing() {
-    await addFavoriteThing(newFavoriteThing);
-    setNewFavoriteThing('');
-    await getThings();
   }
   return (
     <main>
-      <h1>Hello Martin!</h1>
-      <h2>Luke&apos;s Favorite Things</h2>
+      <h1>Trading Card Sale Pricer</h1>
       <input
         placeholder="New Favorite Thing"
-        value={newFavoriteThing}
-        onChange={(e) => setNewFavoriteThing(e.target.value)}
+        value={fileUri}
+        onChange={(e) => setFileUri(e.target.value)}
         className="border-black border-2"
       />
-      <button onClick={addThing} className="border-black border-2 hover:text-white hover:bg-black rounded">
-        Add Favorite Thing
+      <button onClick={handleClick} className="border-black border-2 hover:text-white hover:bg-black rounded">
+        Search Video For Valuable Trading Cards
       </button>
-      <ul className="list-disc list-inside">
-        {favoriteThings}
-      </ul>
+      <table className="table-auto w-full">
+        <thead>
+          <tr>
+            <th>Estimated Value</th>
+            <th>Player</th>
+            <th>Manufacturer</th>
+            <th>Sport</th>
+            <th>Year</th>
+            <th>Search on Google</th>
+          </tr>
+        </thead>
+        <tbody>
+          {favoriteThings.map(item => <tr key={item.fullTitle}>
+            <td>${item.estimatedValueInCents / 100}</td>
+            <td>{item.playerName}</td>
+            <td>{item.manufacturer}</td>
+            <td>{item.sport}</td>
+            <td>{item.year}</td>
+            <td>
+              <a href={`https://www.google.com/search?q=${item.fullTitle}`} target="_blank">Learn More ↗</a>
+            </td>
+          </tr>)}
+        </tbody>
+      </table>
     </main>
   );
 }

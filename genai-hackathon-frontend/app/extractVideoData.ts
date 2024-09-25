@@ -13,14 +13,21 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
         'topP': 0.95,
         "responseMimeType": 'application/json',
         "responseSchema": {
+            // @ts-expect-error type seems to be broken in library
             "type": "ARRAY",
             "items": {
+                // @ts-expect-error type seems to be broken in library
                 "type": "OBJECT",
                 "properties": {
+                    // @ts-expect-error type seems to be broken in library
                     "fullTitle": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "playerName": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "manufacturer": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "year": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "sport": { type: 'STRING' },
                 }
             }
@@ -32,11 +39,11 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
 const text1 = { text: `You are a trading card expert. Find the title and estimated value in cents for all of these trading cards. Assume perfect condition. This does not need to be a perfect appraisal.` };
 
 
-export async function extractVideoData() {
+export async function extractVideoData({ fileUri }: { fileUri: string }) {
     const video1 = {
         fileData: {
             mimeType: 'video/mp4',
-            fileUri: `gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4`
+            fileUri,
         }
     };
     const req = {
@@ -47,6 +54,13 @@ export async function extractVideoData() {
 
     const result = await generativeModel.generateContent(req);
 
-    return result.response.candidates[0].content.parts[0].text;
+    if (!result.response.candidates) {
+        throw new Error('No response candidates in extractVideoData');
+    }
 
+    if (!result.response.candidates[0].content.parts[0].text) {
+        throw new Error('No text from candidate in extractVideoData');
+    }
+
+    return result.response.candidates[0].content.parts[0].text;
 }

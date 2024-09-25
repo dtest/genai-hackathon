@@ -13,15 +13,23 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
         'topP': 0.95,
         "responseMimeType": 'application/json',
         "responseSchema": {
+            // @ts-expect-error type seems to be broken in library
             "type": "ARRAY",
             "items": {
+                // @ts-expect-error type seems to be broken in library
                 "type": "OBJECT",
                 "properties": {
+                    // @ts-expect-error type seems to be broken in library
                     "fullTitle": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "playerName": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "manufacturer": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "year": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "sport": { type: 'STRING' },
+                    // @ts-expect-error type seems to be broken in library
                     "estimatedValueInCents": { type: 'INTEGER' },
                 }
             }
@@ -45,6 +53,16 @@ export async function groundWithGoogleSearch({ extractedVideoData }: { extracted
     };
 
     const result = await generativeModel.generateContent(req);
+
+
+    if (!result.response.candidates) {
+        throw new Error('No response candidates in groundWithGoogleSearch');
+    }
+
+    if (!result.response.candidates[0].content.parts[0].text) {
+        throw new Error('No text from candidate in groundWithGoogleSearch');
+    }
+
 
     return result.response.candidates[0].content.parts[0].text;
 }
