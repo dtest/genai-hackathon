@@ -5,7 +5,7 @@ import Card from "./card";
 
 export default function Home() {
   const [fileUri, setFileUri] = useState('gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4');
-  const [status, setStatus] = useState<'success' | 'error' | 'loading'>('success');
+  const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'uploading'>('success');
   const [favoriteThings, setFavoriteThings] = useState<EstimatedValueItems[]>([]);
 
   async function getEstimates({ fileUri }: { fileUri: string }) {
@@ -27,7 +27,7 @@ export default function Home() {
   
 
   async function handleUploadClick(formData: FormData) {
-    setStatus('loading');
+    setStatus('uploading');
     const { fileUri } = await UploadFile(formData);
     getEstimates({ fileUri });
   }
@@ -36,7 +36,7 @@ export default function Home() {
       <h1>Trading Card Sale Pricer</h1>
       <form action={handleUploadClick}>
         <input type='file' name='file' />
-        <button type="submit" disabled={status === 'loading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
+        <button onClick={() => setStatus('uploading')} type="submit" disabled={status === 'loading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
           Upload
         </button>
       </form>
@@ -48,11 +48,11 @@ export default function Home() {
           className="border-black border-2 text-black p-1 w-full"
           disabled={status === 'loading'}
         />
-        <button type="submit" disabled={status === 'loading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
+        <button type="submit" disabled={status === 'loading' || status === 'uploading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
           {'Search Video For Valuable Trading Cards ->'}
         </button>
       </form>
-      <div className={`transition-opacity duration-1000 overflow-x-clip pointer-events-none ${status === 'loading' ? 'opacity-100' : 'opacity-0'} h-0`}>
+      <div className={`transition-opacity duration-1000 overflow-x-clip pointer-events-none ${(status === 'loading' || status === 'uploading') ? 'opacity-100' : 'opacity-0'} h-0`}>
         <Card status={status} />
       </div>
       <table className={`transition-opacity duration-1000 table-auto ${favoriteThings.length > 0 ? 'opacity-100' : 'opacity-0'} m-10`}>
