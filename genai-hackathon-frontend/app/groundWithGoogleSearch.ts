@@ -22,7 +22,7 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
                     "manufacturer": { type: 'STRING' },
                     "year": { type: 'STRING' },
                     "sport": { type: 'STRING' },
-                    "estimatedValueInCents": { type: 'NUMBER' },
+                    "estimatedValueInCents": { type: 'INTEGER' },
                 }
             }
         },
