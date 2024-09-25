@@ -4,7 +4,6 @@ import { extractVideoData } from "./extractVideoData";
 import { groundWithGoogleSearch } from "./groundWithGoogleSearch";
 
 export type EstimatedValueItems = {
-    "fullTitle": string,
     "playerName": string,
     "manufacturer": string,
     "year": string,

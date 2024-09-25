@@ -5,13 +5,18 @@ import Card from "./card";
 
 export default function Home() {
   const [fileUri, setFileUri] = useState('gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4');
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<'success' | 'error' | 'loading'>('success');
   const [favoriteThings, setFavoriteThings] = useState<EstimatedValueItems[]>([]);
   async function handleClick() {
-    setLoading(true);
-    const updatedListOfThings = await getItemValueEstimates({ fileUri });
-    setLoading(false);
-    setFavoriteThings(updatedListOfThings);
+    setStatus('loading');
+    try {
+      const updatedListOfThings = await getItemValueEstimates({ fileUri });
+      setFavoriteThings(updatedListOfThings);
+      setStatus('success');
+    } catch (error) {
+      setStatus('error');
+      console.error(error)
+    }
   }
   return (
     <main>
@@ -25,7 +30,7 @@ export default function Home() {
       <button onClick={handleClick} className="border-black border-2 hover:text-white hover:bg-black rounded">
         Search Video For Valuable Trading Cards
       </button>
-      <div className={`transition-opacity overflow-x-clip pointer-events-none ${loading ? 'opacity-100' : 'opacity-0'} h-0`}>
+      <div className={`transition-opacity overflow-x-clip pointer-events-none ${status === 'loading' ? 'opacity-100' : 'opacity-0'} h-0`}>
         <Card />
       </div>
       <table className={`transition-opacity table-auto w-full ${favoriteThings.length > 0 ? 'opacity-100' : 'opacity-0'}`}>
@@ -40,14 +45,19 @@ export default function Home() {
           </tr>
         </thead>
         <tbody>
-          {favoriteThings.map(item => <tr key={item.fullTitle}>
-            <td>${item.estimatedValueInCents / 100}</td>
+          {favoriteThings.map((item, index) => <tr key={JSON.stringify(index)}>
+            <td>
+              {(item.estimatedValueInCents / 100).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+              })}
+            </td>
             <td>{item.playerName}</td>
             <td>{item.manufacturer}</td>
             <td>{item.sport}</td>
             <td>{item.year}</td>
             <td>
-              <a href={`https://www.google.com/search?q=${item.fullTitle}`} target="_blank">Learn More ↗</a>
+              <a href={`https://www.google.com/search?q=${item.year} ${item.playerName} ${item.manufacturer} ${item.sport} card`} target="_blank">Learn More ↗</a>
             </td>
           </tr>)}
         </tbody>

@@ -20,8 +20,6 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
                 "type": "OBJECT",
                 "properties": {
                     // @ts-expect-error type seems to be broken in library
-                    "fullTitle": { type: 'STRING' },
-                    // @ts-expect-error type seems to be broken in library
                     "playerName": { type: 'STRING' },
                     // @ts-expect-error type seems to be broken in library
                     "manufacturer": { type: 'STRING' },
