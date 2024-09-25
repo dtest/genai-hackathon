@@ -1,6 +1,7 @@
 'use server'
 
-import { VertexAI } from '@google-cloud/vertexai';
+import { extractVideoData } from "./extractVideoData";
+import { groundWithGoogleSearch } from "./groundWithGoogleSearch";
 
 const favoriteThings = [
     'Chocolate',
@@ -10,7 +11,10 @@ const favoriteThings = [
 ];
 
 export async function getFavoriteThings() {
-    return favoriteThings;
+    const extractedVideoData = await extractVideoData();
+    const estimatedValueItems = await groundWithGoogleSearch({ extractedVideoData });
+    // TODO: Save estimatedValueItems to database
+    return estimatedValueItems;
 }
 
 export async function addFavoriteThing(newThing: string) {

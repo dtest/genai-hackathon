@@ -4,7 +4,7 @@ import { addFavoriteThing, getFavoriteThings } from "./actions";
 
 export default function Home() {
   const [newFavoriteThing, setNewFavoriteThing] = useState('');
-  const [favoriteThings, setFavoriteThings] = useState<string[]>([]);
+  const [favoriteThings, setFavoriteThings] = useState('');
   async function getThings() {
     const updatedListOfThings = await getFavoriteThings();
     setFavoriteThings(updatedListOfThings);
@@ -31,9 +31,7 @@ export default function Home() {
         Add Favorite Thing
       </button>
       <ul className="list-disc list-inside">
-        {favoriteThings.map(function (thing) {
-          return <li key={thing}>{thing}</li>
-        })}
+        {favoriteThings}
       </ul>
     </main>
   );

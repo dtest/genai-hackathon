@@ -11,49 +11,42 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
         'maxOutputTokens': 8192,
         'temperature': 0,
         'topP': 0.95,
+        "responseMimeType": 'application/json',
+        "responseSchema": {
+            "type": "ARRAY",
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "fullTitle": { type: 'STRING' },
+                    "playerName": { type: 'STRING' },
+                    "manufacturer": { type: 'STRING' },
+                    "year": { type: 'STRING' },
+                    "sport": { type: 'STRING' },
+                }
+            }
+        },
     },
-    safetySettings: [
-        {
-            'category': 'HARM_CATEGORY_HATE_SPEECH',
-            'threshold': 'OFF',
-        },
-        {
-            'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-            'threshold': 'OFF',
-        },
-        {
-            'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-            'threshold': 'OFF',
-        },
-        {
-            'category': 'HARM_CATEGORY_HARASSMENT',
-            'threshold': 'OFF',
-        }
-    ],
+    safetySettings: [],
 });
 
 const text1 = { text: `You are a trading card expert. Find the title and estimated value in cents for all of these trading cards. Assume perfect condition. This does not need to be a perfect appraisal.` };
-const video1 = {
-    fileData: {
-        mimeType: 'video/mp4',
-        fileUri: `gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4`
-    }
-};
 
-async function generateContent() {
+
+export async function extractVideoData() {
+    const video1 = {
+        fileData: {
+            mimeType: 'video/mp4',
+            fileUri: `gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4`
+        }
+    };
     const req = {
         contents: [
             { role: 'user', parts: [text1, video1] }
         ],
     };
 
-    const streamingResp = await generativeModel.generateContentStream(req);
+    const result = await generativeModel.generateContent(req);
 
-    for await (const item of streamingResp.stream) {
-        process.stdout.write('stream chunk: ' + JSON.stringify(item) + '\n');
-    }
+    return result.response.candidates[0].content.parts[0].text;
 
-    process.stdout.write('aggregated response: ' + JSON.stringify(await streamingResp.response));
 }
-
-generateContent();
