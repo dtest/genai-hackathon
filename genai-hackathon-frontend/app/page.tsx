@@ -1,15 +1,14 @@
 'use client'
 import { useState } from "react";
-import { EstimatedValueItems, getItemValueEstimates } from "./actions";
+import { EstimatedValueItems, getItemValueEstimates, UploadFile } from "./actions";
 import Card from "./card";
 
 export default function Home() {
   const [fileUri, setFileUri] = useState('gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4');
   const [status, setStatus] = useState<'success' | 'error' | 'loading'>('success');
   const [favoriteThings, setFavoriteThings] = useState<EstimatedValueItems[]>([]);
-  // @ts-expect-error
-  async function handleClick(event) {
-    event.preventDefault();
+
+  async function getEstimates({ fileUri }: { fileUri: string }) {
     setStatus('loading');
     try {
       const updatedListOfThings = await getItemValueEstimates({ fileUri });
@@ -20,9 +19,27 @@ export default function Home() {
       console.error(error)
     }
   }
+  
+  async function handleClick(event: React.FormEvent) {
+    event.preventDefault();
+    getEstimates({fileUri})
+  }
+  
+
+  async function handleUploadClick(formData: FormData) {
+    setStatus('loading');
+    const { fileUri } = await UploadFile(formData);
+    getEstimates({ fileUri });
+  }
   return (
     <main>
       <h1>Trading Card Sale Pricer</h1>
+      <form action={handleUploadClick}>
+        <input type='file' name='file' />
+        <button type="submit" disabled={status === 'loading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
+          Upload
+        </button>
+      </form>
       <form onSubmit={handleClick}>
         <input
           placeholder="New Favorite Thing"
