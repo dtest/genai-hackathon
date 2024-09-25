@@ -53,7 +53,7 @@ export default function Home() {
         </button>
       </form>
       <div className={`transition-opacity duration-1000 overflow-x-clip pointer-events-none ${status === 'loading' ? 'opacity-100' : 'opacity-0'} h-0`}>
-        <Card />
+        <Card status={status} />
       </div>
       <table className={`transition-opacity duration-1000 table-auto ${favoriteThings.length > 0 ? 'opacity-100' : 'opacity-0'} m-10`}>
         <thead>

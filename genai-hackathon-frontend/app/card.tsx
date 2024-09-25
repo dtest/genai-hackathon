@@ -1,6 +1,6 @@
 'use client'
 
-export default function Card() {
+export default function Card({ status }: { status: string }) {
   return (
     <div className="card-wrapper">
       <div className="card">
@@ -9,14 +9,14 @@ export default function Card() {
             <div className="card-image-wrapper">
               <img
                 className="front-image"
-                src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg"
+                src={status === 'uploading' ? "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Google_Cloud_storage.svg/128px-Google_Cloud_storage.svg.png" : "https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg"}
                 alt="Mad Hatter"
               />
             </div>
             <div className="card-description">
-              <h1 className="title">Estimation in Progress</h1>
+              <h1 className="title">{status === 'uploading' ? "Uploading" : "Generating"}</h1>
               <p className="description">
-                Reaching out the Gemini to find the latest information about these cards.
+                {status === 'uploading' ? "Sending your file to Google Cloud Storage." : "Asking Gemini to estimate the value of these cards."}
               </p>
             </div>
           </div>
