@@ -1,12 +1,16 @@
 'use client'
 import { useState } from "react";
 import { EstimatedValueItems, getItemValueEstimates } from "./actions";
+import Card from "./card";
 
 export default function Home() {
   const [fileUri, setFileUri] = useState('gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4');
+  const [loading, setLoading] = useState(false);
   const [favoriteThings, setFavoriteThings] = useState<EstimatedValueItems[]>([]);
   async function handleClick() {
+    setLoading(true);
     const updatedListOfThings = await getItemValueEstimates({ fileUri });
+    setLoading(false);
     setFavoriteThings(updatedListOfThings);
   }
   return (
@@ -21,7 +25,10 @@ export default function Home() {
       <button onClick={handleClick} className="border-black border-2 hover:text-white hover:bg-black rounded">
         Search Video For Valuable Trading Cards
       </button>
-      <table className="table-auto w-full">
+      <div className={`transition-opacity overflow-x-clip pointer-events-none ${loading ? 'opacity-100' : 'opacity-0'} h-0`}>
+        <Card />
+      </div>
+      <table className={`transition-opacity table-auto w-full ${favoriteThings.length > 0 ? 'opacity-100' : 'opacity-0'}`}>
         <thead>
           <tr>
             <th>Estimated Value</th>
