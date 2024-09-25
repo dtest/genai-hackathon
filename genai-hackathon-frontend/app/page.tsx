@@ -19,12 +19,12 @@ export default function Home() {
       console.error(error)
     }
   }
-  
+
   async function handleClick(event: React.FormEvent) {
     event.preventDefault();
-    getEstimates({fileUri})
+    getEstimates({ fileUri })
   }
-  
+
 
   async function handleUploadClick(formData: FormData) {
     setStatus('uploading');
@@ -34,24 +34,27 @@ export default function Home() {
   return (
     <main>
       <h1>Trading Card Sale Pricer</h1>
-      <form action={handleUploadClick}>
-        <input type='file' name='file' />
-        <button onClick={() => setStatus('uploading')} type="submit" disabled={status === 'loading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
-          Upload
-        </button>
-      </form>
-      <form onSubmit={handleClick}>
-        <input
-          placeholder="New Favorite Thing"
-          value={fileUri}
-          onChange={(e) => setFileUri(e.target.value)}
-          className="border-black border-2 text-black p-1 w-full"
-          disabled={status === 'loading'}
-        />
-        <button type="submit" disabled={status === 'loading' || status === 'uploading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
-          {'Search Video For Valuable Trading Cards ->'}
-        </button>
-      </form>
+      <div className="flex w-full justify-around">
+        <form action={handleUploadClick} className="border border-white/20 p-4">
+          <input type='file' name='file' />
+          <button onClick={() => setStatus('uploading')} type="submit" disabled={status === 'loading' || status === 'uploading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
+            Upload
+          </button>
+        </form>
+        <div>OR</div>
+        <form onSubmit={handleClick} className="border border-white/20 p-4">
+          <input
+            placeholder="New Favorite Thing"
+            value={fileUri}
+            onChange={(e) => setFileUri(e.target.value)}
+            className="border-black border-2 text-black p-1 w-full"
+            disabled={status === 'loading' || status === 'uploading'}
+          />
+          <button type="submit" disabled={status === 'loading' || status === 'uploading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
+            {'Search Video For Valuable Trading Cards ->'}
+          </button>
+        </form>
+      </div>
       <div className={`transition-opacity duration-1000 overflow-x-clip pointer-events-none ${(status === 'loading' || status === 'uploading') ? 'opacity-100' : 'opacity-0'} h-0`}>
         <Card status={status} />
       </div>
