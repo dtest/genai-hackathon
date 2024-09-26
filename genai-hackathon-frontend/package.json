@@ -12,12 +12,14 @@
     "@google-cloud/storage": "^7.13.0",
     "@google-cloud/vertexai": "^1.8.1",
     "next": "14.2.13",
+    "pg-pool": "^3.7.0",
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/pg-pool": "^2.0.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",

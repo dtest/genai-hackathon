@@ -3,6 +3,7 @@
 import { extractVideoData } from "./extractVideoData";
 import { groundWithGoogleSearch } from "./groundWithGoogleSearch";
 import { Storage } from "@google-cloud/storage";
+import Pool from 'pg-pool';
 
 export type EstimatedValueItems = {
     "playerName": string,
@@ -66,7 +67,37 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
         throw new Error('None of the attempts to estimate were valid. All of them contained at least one NaN as an estimate.')
     }
     const sortedValueItems = firstValidResponse.toSorted((a, b) => b.estimatedValueInCents - a.estimatedValueInCents)
-    // TODO: Save estimatedValueItems to database
-    
+
+    // **TODO: Save sortedValueItems to alloy db database**
+    const pool = new Pool({
+        user: process.env.DB_USER,
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        password: process.env.DB_PASSWORD,
+        port: parseInt(process.env.DB_PORT || '5432'),
+        ssl: {
+          rejectUnauthorized: false, // Important for AlloyDB
+        },
+      });
+
+    try {
+        await pool.query('BEGIN');
+        for (const item of sortedValueItems) {
+            await pool.query(
+                `INSERT INTO trading_cards (playerName, manufacturer, year, sport, estimatedValueInCents) 
+                 VALUES ($1, $2, $3, $4, $5)`,
+                [item.playerName, item.manufacturer, item.year, item.sport, item.estimatedValueInCents]
+            );
+        }
+        await pool.query('COMMIT');
+        console.log('Successfully saved estimated values to AlloyDB!');
+    } catch (error) {
+        await pool.query('ROLLBACK');
+        console.error('Error saving estimated values to AlloyDB:', error);
+        throw error; // Re-throw the error to be handled elsewhere
+    } finally {
+        await pool.end();
+    }
+
     return sortedValueItems;
 }
