@@ -73,6 +73,18 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
     }))
 
     // **TODO: Save sortedValueItems to alloy db database**
+
+    const poolConfig = {
+        user: process.env.DB_USER,
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        password: process.env.DB_PASSWORD,
+        port: parseInt(process.env.DB_PORT || '5432'),
+        ssl: {
+            rejectUnauthorized: false, // Important for AlloyDB
+        },
+    };
+
     const pool = new Pool({
         user: process.env.DB_USER,
         host: process.env.DB_HOST,
@@ -80,11 +92,23 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
         password: process.env.DB_PASSWORD,
         port: parseInt(process.env.DB_PORT || '5432'),
         ssl: {
-          rejectUnauthorized: false, // Important for AlloyDB
+            rejectUnauthorized: false, // Important for AlloyDB
         },
-      });
+    });
+
+    console.log('poolConfig:', {
+        user: process.env.DB_USER,
+        host: process.env.DB_HOST?.slice(0, 5),
+        database: process.env.DB_NAME,
+        password: process.env.DB_PASSWORD?.slice(0, 5),
+        port: parseInt(process.env.DB_PORT || '5432'),
+        ssl: {
+            rejectUnauthorized: false, // Important for AlloyDB
+        },
+    });
 
     try {
+        console.log('begin save to database');
         await pool.query('BEGIN');
         for (const item of sortedValueItems) {
             await pool.query(
@@ -101,6 +125,7 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
         throw error; // Re-throw the error to be handled elsewhere
     } finally {
         await pool.end();
+        console.log('closing connection to database')
         return sortedValueItems;
     }
 }
