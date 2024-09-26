@@ -11,6 +11,7 @@ export type EstimatedValueItems = {
     "year": string,
     "sport": string,
     "estimatedValueInCents": number,
+    "cardTitle": string,
 };
 
 export async function UploadFile(form: FormData) {
@@ -66,7 +67,10 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
     if (!firstValidResponse) {
         throw new Error('None of the attempts to estimate were valid. All of them contained at least one NaN as an estimate.')
     }
-    const sortedValueItems = firstValidResponse.toSorted((a, b) => b.estimatedValueInCents - a.estimatedValueInCents)
+    const sortedValueItems = firstValidResponse.toSorted((a, b) => b.estimatedValueInCents - a.estimatedValueInCents).map(item => ({
+        ...item,
+        cardTitle: `${item.year} ${item.playerName} ${item.manufacturer} ${item.sport} card`,
+    }))
 
     // **TODO: Save sortedValueItems to alloy db database**
     const pool = new Pool({
@@ -84,9 +88,9 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
         await pool.query('BEGIN');
         for (const item of sortedValueItems) {
             await pool.query(
-                `INSERT INTO trading_cards (playerName, manufacturer, year, sport, estimatedValueInCents) 
-                 VALUES ($1, $2, $3, $4, $5)`,
-                [item.playerName, item.manufacturer, item.year, item.sport, item.estimatedValueInCents]
+                `INSERT INTO trading_cards (playerName, manufacturer, year, sport, estimatedValueInCents, cardTitle) 
+                 VALUES ($1, $2, $3, $4, $5, $6)`,
+                [item.playerName, item.manufacturer, item.year, item.sport, item.estimatedValueInCents, item.cardTitle]
             );
         }
         await pool.query('COMMIT');
@@ -97,7 +101,6 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
         throw error; // Re-throw the error to be handled elsewhere
     } finally {
         await pool.end();
+        return sortedValueItems;
     }
-
-    return sortedValueItems;
 }

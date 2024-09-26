@@ -74,7 +74,7 @@ export default function Home() {
               <td className="px-5">{item.sport}</td>
               <td className="px-5">{item.year}</td>
               <td className="px-5">
-                <a href={`https://www.google.com/search?q=${item.year} ${item.playerName} ${item.manufacturer} ${item.sport} card`} target="_blank">Learn More ↗</a>
+                <a href={`https://www.google.com/search?q=${item.cardTitle}`} target="_blank">Learn More ↗</a>
               </td>
             </tr>)}
           </tbody>
