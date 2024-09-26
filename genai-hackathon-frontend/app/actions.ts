@@ -44,16 +44,28 @@ export async function UploadFileFromFormData(form: FormData) {
 
 export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
     const extractedVideoData = await extractVideoData({ fileUri });
-    let estimatedValueItems: EstimatedValueItems[] = [];
-    for (let i = 0; i < 5; i++) {
-        const estimatedValueItemsString = await groundWithGoogleSearch({ extractedVideoData });
-        estimatedValueItems = JSON.parse(estimatedValueItemsString) as EstimatedValueItems[];
-        const responseContainsNaN = estimatedValueItems.some((item) => Number.isNaN(item.estimatedValueInCents));
-        if (!responseContainsNaN) {
-            break;
-        }
+    const estimatedValueAttempts = await Promise.all([
+        await groundWithGoogleSearch({ extractedVideoData }),
+        await groundWithGoogleSearch({ extractedVideoData }),
+        await groundWithGoogleSearch({ extractedVideoData }),
+        await groundWithGoogleSearch({ extractedVideoData }),
+        await groundWithGoogleSearch({ extractedVideoData }),
+    ]);
+    const parsedEstimatedValueAttempts = estimatedValueAttempts.map((estimatedValueAttempt) => {
+        return JSON.parse(estimatedValueAttempt) as EstimatedValueItems[];
+    });
+    console.log({ parsedEstimatedValueAttempts })
+    const validResponses = parsedEstimatedValueAttempts.filter((estimatedValueAttempt) => {
+        const responseContainsNaN = estimatedValueAttempt.some((item) => !item.estimatedValueInCents || Number.isNaN(item.estimatedValueInCents));
+        console.log({ estimatedValueAttempt, responseContainsNaN });
+        return !responseContainsNaN;
+    });
+    console.log(`There were ${validResponses.length} valid responses out of ${estimatedValueAttempts.length} attempts.`);
+    const firstValidResponse = validResponses[0];
+    if (!firstValidResponse) {
+        throw new Error('None of the attempts to estimate were valid. All of them contained at least one NaN as an estimate.')
     }
-    const sortedValueItems = estimatedValueItems.toSorted((a, b) => b.estimatedValueInCents - a.estimatedValueInCents)
+    const sortedValueItems = firstValidResponse.toSorted((a, b) => b.estimatedValueInCents - a.estimatedValueInCents)
     // TODO: Save estimatedValueItems to database
 
     return sortedValueItems;
