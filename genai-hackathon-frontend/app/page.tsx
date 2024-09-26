@@ -43,7 +43,7 @@ export default function Home() {
         {
           isDragActive ?
             <center>Drop the files to upload and estimate the value of these cards using Vertex AI and Gemini.</center> :
-            <center>Drag 'n' drop some image or video files of trading cards here, or click to select files.</center>
+            <center>Drag and drop some image or video files of trading cards here, or click to select files.</center>
         }
       </div>
       <div className={`transition-opacity duration-1000 overflow-x-clip pointer-events-none ${(status === 'loading' || status === 'uploading') ? 'opacity-100' : 'opacity-0'} h-0`}>
