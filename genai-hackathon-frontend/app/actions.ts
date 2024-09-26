@@ -85,26 +85,12 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
         },
     };
 
-    const pool = new Pool({
-        user: process.env.DB_USER,
-        host: process.env.DB_HOST,
-        database: process.env.DB_NAME,
-        password: process.env.DB_PASSWORD,
-        port: parseInt(process.env.DB_PORT || '5432'),
-        ssl: {
-            rejectUnauthorized: false, // Important for AlloyDB
-        },
-    });
+    const pool = new Pool(poolConfig);
 
     console.log('poolConfig:', {
-        user: process.env.DB_USER,
+        ...poolConfig,
         host: process.env.DB_HOST?.slice(0, 5),
-        database: process.env.DB_NAME,
         password: process.env.DB_PASSWORD?.slice(0, 5),
-        port: parseInt(process.env.DB_PORT || '5432'),
-        ssl: {
-            rejectUnauthorized: false, // Important for AlloyDB
-        },
     });
 
     try {
