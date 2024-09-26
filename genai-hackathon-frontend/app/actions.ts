@@ -50,7 +50,7 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
         await groundWithGoogleSearch({ extractedVideoData }),
         await groundWithGoogleSearch({ extractedVideoData }),
         await groundWithGoogleSearch({ extractedVideoData }),
-    ]);
+    ]) as string[];
     const parsedEstimatedValueAttempts = estimatedValueAttempts.map((estimatedValueAttempt) => {
         return JSON.parse(estimatedValueAttempt) as EstimatedValueItems[];
     });
