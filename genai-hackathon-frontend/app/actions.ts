@@ -122,7 +122,6 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
     } catch (error) {
         await pool.query('ROLLBACK');
         console.error('Error saving estimated values to AlloyDB:', error);
-        throw error; // Re-throw the error to be handled elsewhere
     } finally {
         await pool.end();
         console.log('closing connection to database')
