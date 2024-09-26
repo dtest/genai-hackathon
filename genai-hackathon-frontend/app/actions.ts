@@ -67,6 +67,6 @@ export async function getItemValueEstimates({ fileUri }: { fileUri: string }) {
     }
     const sortedValueItems = firstValidResponse.toSorted((a, b) => b.estimatedValueInCents - a.estimatedValueInCents)
     // TODO: Save estimatedValueItems to database
-
+    
     return sortedValueItems;
 }
