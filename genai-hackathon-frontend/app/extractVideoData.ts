@@ -1,4 +1,4 @@
-import { VertexAI } from '@google-cloud/vertexai';
+import { SchemaType, VertexAI, HarmCategory, HarmBlockThreshold } from '@google-cloud/vertexai';
 
 // Initialize Vertex with your Cloud project and location
 const vertex_ai = new VertexAI({ project: 'ganai-hackathon', location: 'us-central1' });
@@ -13,25 +13,36 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
         'topP': 0.95,
         "responseMimeType": 'application/json',
         "responseSchema": {
-            // @ts-expect-error type seems to be broken in library
-            "type": "ARRAY",
+            "type": SchemaType.ARRAY,
             "items": {
-                // @ts-expect-error type seems to be broken in library
-                "type": "OBJECT",
+                "type": SchemaType.OBJECT,
                 "properties": {
-                    // @ts-expect-error type seems to be broken in library
-                    "playerName": { type: 'STRING' },
-                    // @ts-expect-error type seems to be broken in library
-                    "manufacturer": { type: 'STRING' },
-                    // @ts-expect-error type seems to be broken in library
-                    "year": { type: 'STRING' },
-                    // @ts-expect-error type seems to be broken in library
-                    "sport": { type: 'STRING' },
+                    "playerName": { type: SchemaType.STRING },
+                    "manufacturer": { type: SchemaType.STRING },
+                    "year": { type: SchemaType.STRING },
+                    "sport": { type: SchemaType.STRING },
                 }
             }
         },
     },
-    safetySettings: [],
+    safetySettings: [
+      {
+        'category': HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        'threshold': HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        'category': HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        'threshold': HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        'category': HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        'threshold': HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        'category': HarmCategory.HARM_CATEGORY_HARASSMENT,
+        'threshold': HarmBlockThreshold.BLOCK_NONE,
+      }
+    ],
 });
 
 const text1 = { text: `You are a trading card expert. Find the title and estimated value in cents for all of these trading cards. Assume perfect condition. This does not need to be a perfect appraisal.` };
