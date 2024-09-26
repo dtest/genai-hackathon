@@ -1,10 +1,10 @@
 'use client'
-import { useState } from "react";
-import { EstimatedValueItems, getItemValueEstimates, UploadFile } from "./actions";
+import React, { useState} from 'react'
+import {useDropzone} from 'react-dropzone'
+import { EstimatedValueItems, getItemValueEstimates, UploadFileFromFormData } from "./actions";
 import Card from "./card";
 
 export default function Home() {
-  const [fileUri, setFileUri] = useState('gs://cardmedia_ingest/SportsAlbumHeyMickey5.mp4');
   const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'uploading'>('success');
   const [favoriteThings, setFavoriteThings] = useState<EstimatedValueItems[]>([]);
 
@@ -20,40 +20,26 @@ export default function Home() {
     }
   }
 
-  async function handleClick(event: React.FormEvent) {
-    event.preventDefault();
-    getEstimates({ fileUri })
-  }
-
-
-  async function handleUploadClick(formData: FormData) {
+  const onDrop = async (acceptedFiles: File[]) => {
+    // Do something with the files
     setStatus('uploading');
-    const { fileUri } = await UploadFile(formData);
+    console.log({acceptedFiles});
+    const formData = new FormData();
+    formData.append('file', acceptedFiles[0])
+    const { fileUri } = await UploadFileFromFormData(formData);
     getEstimates({ fileUri });
-  }
+  };
+
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
   return (
     <main>
-      <h1>Trading Card Sale Pricer</h1>
-      <div className="flex w-full justify-around">
-        <form action={handleUploadClick} className="border border-white/20 p-4">
-          <input type='file' name='file' />
-          <button onClick={() => setStatus('uploading')} type="submit" disabled={status === 'loading' || status === 'uploading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
-            Upload
-          </button>
-        </form>
-        <div>OR</div>
-        <form onSubmit={handleClick} className="border border-white/20 p-4">
-          <input
-            placeholder="New Favorite Thing"
-            value={fileUri}
-            onChange={(e) => setFileUri(e.target.value)}
-            className="border-black border-2 text-black p-1 w-full"
-            disabled={status === 'loading' || status === 'uploading'}
-          />
-          <button type="submit" disabled={status === 'loading' || status === 'uploading'} className="border-2 p-1 enabled:hover:text-white enabled:hover:bg-black rounded disabled:text-white/50">
-            {'Search Video For Valuable Trading Cards ->'}
-          </button>
-        </form>
+      <div {...getRootProps()} className={`transition-all duration-1000 flex justify-around border border-white/20 p-4 m-4 ${(status === 'loading' || status === 'uploading') ? 'opacity-0' : 'opacity-100'}  ${(status === 'loading' || status === 'uploading' || favoriteThings.length > 0) ? 'h-20' : 'h-56'}`}>
+        <input {...getInputProps()} />
+        {
+          isDragActive ?
+            <p>Drop the files to upload and estimate the value of these cards using Vertex AI and Gemini.</p> :
+            <p>Drag 'n' drop some image or video files of trading cards here, or click to select files</p>
+        }
       </div>
       <div className={`transition-opacity duration-1000 overflow-x-clip pointer-events-none ${(status === 'loading' || status === 'uploading') ? 'opacity-100' : 'opacity-0'} h-0`}>
         <Card status={status} />
